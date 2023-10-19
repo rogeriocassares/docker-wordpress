@@ -1,0 +1,37 @@
+version: "3"
+services:
+  wp-mysql:
+    container_name: wp-mysql
+    restart: always
+    image: mysql:8.1.0
+    environment:
+      MYSQL_DATABASE: wp_db
+      MYSQL_USER: wp_db_user
+      MYSQL_PASSWORD: wp_db_password
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+        - ./mysql/var/lib:/var/lib/mysql
+    networks:
+        - wp-network
+
+  wp-php:
+    container_name: wp-php
+    restart: always
+    image: wordpress:6.3.2-php8.2-apache
+    environment:
+      WORDPRESS_DB_HOST: wp-mysql
+      WORDPRESS_DB_USER: wp_db_user
+      WORDPRESS_DB_PASSWORD: wp_db_password
+      WORDPRESS_DB_NAME: wp_db
+    volumes:
+      - ./wordpress/var/www/html:/var/www/html
+    ports:
+      - 8800:80
+    depends_on:
+      - wp-mysql
+    networks:
+      - wp-network
+
+networks:
+  wp-network:
+    driver: bridge
